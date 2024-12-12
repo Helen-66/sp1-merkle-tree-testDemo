@@ -688,6 +688,8 @@ checksum = "523dc4f511e55ab87b694dc30d0f820d60906ef06413f93d4d7a1385599cc149"
 name = "merkle-tree-script"
 version = "0.1.0"
 dependencies = [
+ "serde",
+ "serde_json",
  "sp1-core",
 ]
 

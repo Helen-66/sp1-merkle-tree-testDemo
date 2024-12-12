@@ -13,3 +13,7 @@ tiny-keccak = { version = "2.0", features = ["keccak"] }
 
 #[patch.crates-io]
 #tiny-keccak = { git = "https://github.com/succinctlabs/tiny-keccak-private.git", branch = "chris/test" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tracing = "0.1"
+tracing-subscriber = "0.3"

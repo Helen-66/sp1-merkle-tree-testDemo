@@ -6,45 +6,60 @@
 use alloy_merkle_tree::tree::MerkleTree;
 use alloy_primitives::{Uint, B256};
 sp1_zkvm::entrypoint!(main);
+//use serde_json;
+//use serde::{de::value, Deserialize, Serialize};
+//use tracing_subscriber;
 
 pub fn main() {
-    let count = sp1_zkvm::io::read::<u64>();
+
+    let count: u64 = sp1_zkvm::io::read::<u64>();
 
     let mut tree = MerkleTree::new();
 
     // 插入整数作为叶子节点
-    let mut values = Vec::new(); // 用于存储所有整数值
+    let mut values= Vec::new(); // 用于存储所有整数值
     println!("Start reading transactions");
 
-    for _ in 0..count {
-        // //读取整数
-        // let value: u64 = sp1_zkvm::io::read();  // 读取整数
+    // for _ in 0..count {
+     for _ in 0..count {
+        //读取整数
+        // let value: u8 = sp1_zkvm::io::read();  // 读取整数
         // values.push(value);  // 将读取的值存储到 `values` 向量中
         // tree.insert(B256::from(Uint::from(value)));
 
-        // 直接读取比特币交易的字节数据
-        let value: Vec<u8> = sp1_zkvm::io::read();  // 读取比特币交易字节数据
+        // 直接读取比特币交易的字节数据，失败报错
+        //let value: Vec<u8> = sp1_zkvm::io::read();  // 读取比特币交易字节数据失败
+
+        //用json读字节数据，失败报错
+        // let json: String = sp1_zkvm::io::read();  // 读取比特币交易字节数据
+        // let value: Vec<u8> = serde_json::from_str(&json).expect("Failed to parse JSON");
+
+        //用切片读vec 字节数据
+        let mut value: Vec<u8> = vec![0u8; 16];  // 创建一个长度为 16 的字节数组，初始值为 0
+        sp1_zkvm::io::read_slice(&mut value);  // 读取比特币交易字节数据
+        
+    
 
         // 将字节数据转换为 B256 类型，并插入 Merkle 树
         let leaf = B256::from_slice(&value);
         tree.insert(leaf);
         values.push(value);  // 存储交易数据（如果需要用于后续操作）
-    }
+     }
 
     tree.finish();
 
     // 如果节点数量大于 1，获取第二个节点的证明
     if count > 1 {
 
-        //整数使用
+      // 整数使用
         // let second_value = values[1];  // 获取第二个节点的整数值
         // let proof = tree.create_proof(&B256::from(Uint::from(second_value))).unwrap();  // 创建第二个节点的证明
 
         //读取字节使用
-        let second_value = &values[1];  // 获取第二个节点的值
+        let second_value = &values[0];  // 获取第二个节点的值
         let proof = tree.create_proof(&B256::from_slice(&second_value)).unwrap();  // 创建第二个节点的证明
 
-        // 验证证明
+        //验证证明
         assert!(MerkleTree::verify_proof(&proof));  // 验证该证明是否有效
         println!("Proof for second node (value: {:?}): verified", second_value);
     } else {
